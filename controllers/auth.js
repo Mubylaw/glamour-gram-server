@@ -1,7 +1,11 @@
 const crypto = require("crypto");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
-const { sendTokenResponse } = require("../helpers/authHelpers");
+const {
+  getGoogleAuthURL,
+  getGoogleUser,
+  sendTokenResponse,
+} = require("../helpers/authHelpers");
 const User = require("../models/User");
 
 // @desc    Register User
@@ -11,6 +15,34 @@ exports.register = asyncHandler(async (req, res, next) => {
   // Create User
   req.body.email = req.body.email.replace(/\s/g, "");
   const user = await User.create(req.body);
+
+  // send email
+  const send_email_url = "https://api.brevo.com/v3/smtp/email";
+
+  const options = JSON.stringify({
+    sender: {
+      name: "Glamor Gram",
+      email: "ml@ojehs.com",
+    },
+    to: [
+      {
+        email: `${user.email}`,
+        name: `${user.firstName} ${user.lastName}`,
+      },
+    ],
+    subject: "Welcome to Glamor Gram",
+    htmlContent:
+      "<html><head></head><body><p>Hello,</p>Welcome to Glamor Gram</p></body></html>",
+  });
+
+  const email = await axios(send_email_url, {
+    method: "POST",
+    data: options,
+    headers: {
+      "api-key": `${process.env.BREVO_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+  });
 
   sendTokenResponse(user, 200, res);
 });
@@ -167,4 +199,101 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
   await user.save();
 
   sendTokenResponse(user, 200, res);
+});
+
+// @desc    Upload avatar for a user
+// @route   PUT /api/v1/auth/avatar
+// @access  Private
+exports.userPhotoUpload = asyncHandler(async (req, res, next) => {
+  if (!req.files.avatar) {
+    return next(new ErrorResponse(`Please upload an image`), 400);
+  }
+  const file = req.files.avatar[0];
+  // make sure that the image is a photo
+  if (!file.mimetype.startsWith("image")) {
+    return next(new ErrorResponse(`Please upload an image file`, 400));
+  }
+
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return next(
+      new ErrorResponse(
+        `Please Upload an image file less than ${
+          process.env.MAX_FILE_UPLOAD / 1000000
+        }mb`,
+        400
+      )
+    );
+  }
+
+  const avatar = await uploadToS3({
+    file: req.files.avatar,
+    folderName: "glamour avatar",
+  });
+
+  await User.findByIdAndUpdate(
+    req.user.id,
+    { picture: avatar[0] },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).select(necessary);
+
+  res.status(200).json({
+    success: true,
+    data: avatar,
+  });
+});
+
+// @desc    Google Url
+// @route   GET /api/v1/auth/googleurl
+// @access  Public
+exports.googleUrl = asyncHandler(async (req, res, next) => {
+  const googleUrl = getGoogleAuthURL();
+
+  res.status(200).json({
+    success: true,
+    data: googleUrl,
+  });
+});
+
+// @desc    Register User with Google
+// @route   GET /api/v1/auth/google
+// @access  Public
+exports.googleLogin = asyncHandler(async (req, res, next) => {
+  const googleCode = req.query.code;
+  const googleUser = await getGoogleUser({ code: googleCode });
+
+  // Check for user
+  const user = await User.findOne({ email: googleUser.email }).select("id");
+
+  if (!user) {
+    // Create User
+    const user = await User.create({
+      firstName: googleUser.given_name,
+      lastName: googleUser.family_name,
+      email: googleUser.email,
+      password: "null",
+      role: "user",
+      picture: googleUser.picture || "no-user.jpg",
+      googleId: googleUser.id,
+      refreshToken: googleUser.tokens.refresh_token,
+    });
+
+    sendTokenResponse(user, 200, res);
+  }
+
+  if (googleUser.tokens.refresh_token) {
+    var fieldsToUpdate = {
+      refreshToken: googleUser.tokens.refresh_token,
+      googleId: googleUser.id,
+    };
+  }
+
+  const newUser = await User.findByIdAndUpdate(user._id, fieldsToUpdate, {
+    new: true,
+    runValidators: true,
+  });
+
+  sendTokenResponse(newUser, 200, res);
 });

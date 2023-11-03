@@ -9,8 +9,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
 const cors = require("cors");
-const { body, query, param } = require("express-validator");
-const { validationResult } = require("express-validator");
+const xss = require("xss-clean");
 const errorHandler = require("./middleware/error");
 const connectDB = require("./config/db");
 
@@ -24,21 +23,11 @@ connectDB();
 
 // route files
 const auth = require("./routes/auth");
-// const users = require("./routes/users");
+const users = require("./routes/users");
+const reviews = require("./routes/reviews");
+const bookings = require("./routes/bookings");
 
 const app = express();
-
-// Global sanitization middleware
-const sanitizeInput = (req, res, next) => {
-  // Sanitize request body
-  body().trim().escape()(req, res, next);
-
-  // Sanitize query parameters
-  query().trim().escape()(req, res, next);
-
-  // Sanitize request parameters
-  param().trim().escape()(req, res, next);
-};
 
 // body parser
 app.use(express.json());
@@ -54,7 +43,7 @@ if (process.env.NODE_ENV === "development") {
 
 // Sanitize input
 app.use(mongoSanitize());
-app.use(sanitizeInput);
+app.use(xss());
 
 // set security headers
 app.use(helmet());
@@ -76,7 +65,9 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/v1/auth", auth);
-// app.use("/api/v1/users", users);
+app.use("/api/v1/users", users);
+app.use("/api/v1/reviews", reviews);
+app.use("/api/v1/bookings", bookings);
 
 app.use(errorHandler);
 

@@ -15,6 +15,86 @@ const UserSchema = new mongoose.Schema(
       required: [true, "Please add a last name"],
       trim: true,
     },
+    name: {
+      type: String,
+      trim: true,
+    },
+    industry: String,
+    portfolio: [
+      {
+        type: String,
+        unique: true,
+        match: [
+          /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
+          "Please add a valid url",
+        ],
+      },
+    ],
+    pin: [
+      {
+        type: String,
+        unique: true,
+        match: [
+          /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
+          "Please add a valid url",
+        ],
+      },
+    ],
+    insta: {
+      type: String,
+      unique: true,
+      match: [
+        /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
+        "Please add a valid url",
+      ],
+    },
+    twitter: {
+      type: String,
+      unique: true,
+      match: [
+        /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
+        "Please add a valid url",
+      ],
+    },
+    facebook: {
+      type: String,
+      unique: true,
+      match: [
+        /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
+        "Please add a valid url",
+      ],
+    },
+    cert: String,
+    male: {
+      type: Boolean,
+      default: false,
+    },
+    female: {
+      type: Boolean,
+      default: true,
+    },
+    type: {
+      type: String,
+      enum: ["female", "male"],
+      default: "female",
+    },
+    category: [
+      new mongoose.Schema(
+        {
+          name: String,
+          service: [
+            new mongoose.Schema(
+              {
+                name: String,
+                price: Number,
+              },
+              { _id: false }
+            ),
+          ],
+        },
+        { _id: false }
+      ),
+    ],
     email: {
       type: String,
       required: [true, "Please add an email"],
@@ -38,6 +118,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "no-user.jpg",
     },
+    googleId: String,
+    refreshToken: String,
+    phoneNo: String,
     refreshToken: String,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
