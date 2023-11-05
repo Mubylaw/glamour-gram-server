@@ -13,7 +13,7 @@ const AppointmentSchema = new mongoose.Schema({
   },
   name: String,
   eventId: String,
-  time: String,
+  time: Date,
   htmlLink: String,
   meetLink: String,
   purpose: String,

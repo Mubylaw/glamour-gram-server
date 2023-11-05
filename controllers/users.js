@@ -15,7 +15,7 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/user/:id
 // @access  Private / admin
 exports.getUser = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id).populate(req.query.populate);
   if (!user) {
     return next(
       new ErrorResponse(`User not found with id of ${req.params.id}`, 404)
@@ -189,5 +189,69 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: {},
+  });
+});
+
+// @desc    Update free time
+// @route   PUT /api/v1/users/freetime
+// @access  Private
+exports.addTime = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("freeTime");
+
+  var freeTime = user.freeTime;
+  req.body.freeTime.forEach((newTime) => {
+    const { day, hour } = newTime;
+
+    const isDuplicate = freeTime.some(
+      (time) => time.day === day && time.hour === hour
+    );
+
+    if (!isDuplicate) {
+      freeTime.push(newTime);
+    }
+  });
+
+  const newUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { freeTime },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json({
+    success: true,
+    data: newUser,
+  });
+});
+
+// @desc    Delete free time
+// @route   DELETE /api/v1/users/freetime/:id
+// @access  Private
+exports.removeTime = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("freeTime");
+
+  var freeTime = user.freeTime;
+  const foundTime = freeTime.findIndex((el) => el._id == req.params.id);
+  if (foundTime === -1) {
+    return next(
+      new ErrorResponse(`Time not found with id of ${req.params.id}`, 404)
+    );
+  }
+  freeTime.splice(foundTime, 1);
+
+  await User.findByIdAndUpdate(
+    req.user.id,
+    { freeTime },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json({
+    success: true,
+    data: user,
   });
 });

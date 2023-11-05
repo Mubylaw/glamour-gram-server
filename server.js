@@ -26,6 +26,9 @@ const auth = require("./routes/auth");
 const users = require("./routes/users");
 const reviews = require("./routes/reviews");
 const bookings = require("./routes/bookings");
+const appointments = require("./routes/appointments");
+const tickets = require("./routes/tickets");
+const payment = require("./routes/payment");
 
 const app = express();
 
@@ -68,6 +71,9 @@ app.use("/api/v1/auth", auth);
 app.use("/api/v1/users", users);
 app.use("/api/v1/reviews", reviews);
 app.use("/api/v1/bookings", bookings);
+app.use("/api/v1/appointments", appointments);
+app.use("/api/v1/tickets", tickets);
+app.use("/api/v1/payment", payment);
 
 app.use(errorHandler);
 

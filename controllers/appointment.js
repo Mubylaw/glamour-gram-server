@@ -4,53 +4,6 @@ const Appointment = require("../models/Appointment");
 const User = require("../models/User");
 const { scheduleMeeting } = require("../utils/calendarApi");
 
-// @desc    Get a random mentor
-// @route   GET /api/v1/appointments/field/:field
-// @access  Private
-exports.getMentor = asyncHandler(async (req, res, next) => {
-  const mentorSlug = await User.findOne({
-    username: req.params.field,
-    role: "mentor",
-  });
-
-  if (mentorSlug) {
-    res.status(200).json({ success: true, data: mentorSlug });
-    return;
-  }
-
-  const mentors = await User.find({ field: req.params.field, role: "mentor" });
-
-  if (!mentors) {
-    return next(
-      new ErrorResponse(
-        `Mentor not found for field of ${req.params.field}`,
-        404
-      )
-    );
-  }
-
-  var mentor = await getRandomMentor(mentors);
-
-  res.status(200).json({ success: true, data: mentor });
-});
-
-// @desc    Get a single mentor
-// @route   GET /api/v1/appointments/singlementor/:id
-// @access  Private
-exports.getOneMentor = asyncHandler(async (req, res, next) => {
-  const mentor = await User.findOne({
-    username: req.params.id,
-    role: "mentor",
-  });
-
-  if (!mentor) {
-    return next(
-      new ErrorResponse(`Mentor not found with username ${req.params.id}`, 404)
-    );
-  }
-  res.status(200).json({ success: true, data: mentor });
-});
-
 // @desc    Schedule a appointment
 // @route   POST /api/v1/appointments
 // @access  Private
@@ -169,54 +122,6 @@ exports.scheduleAppointment = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.getAppointments = asyncHandler(async (req, res, next) => {
   res.status(200).json(res.advancedResults);
-});
-
-// @desc    Get All Appointments for a mentor
-// @route   GET /api/v1/appointments/mentor/:id
-// @access  Private/ Admin and Mentor
-exports.getMentorAppointments = asyncHandler(async (req, res, next) => {
-  const appointments = await Appointment.find({
-    mentor: req.params.id,
-  }).populate("mentee");
-
-  if (!appointments) {
-    return next(
-      new ErrorResponse(
-        `Appointment not found with id of ${req.params.id}`,
-        404
-      )
-    );
-  }
-
-  return res.status(200).json({
-    success: true,
-    count: appointments.length,
-    data: appointments,
-  });
-});
-
-// @desc    Get All Appointments for a mentee
-// @route   GET /api/v1/appointments/mentee/:id
-// @access  Private/ Admin and User
-exports.getMenteeAppointments = asyncHandler(async (req, res, next) => {
-  const appointments = await Appointment.find({
-    mentee: req.params.id,
-  }).populate("mentor");
-
-  if (!appointments) {
-    return next(
-      new ErrorResponse(
-        `Appointment not found with id of ${req.params.id}`,
-        404
-      )
-    );
-  }
-
-  return res.status(200).json({
-    success: true,
-    count: appointments.length,
-    data: appointments,
-  });
 });
 
 // @desc    Get a single Appointment

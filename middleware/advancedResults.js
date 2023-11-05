@@ -19,6 +19,11 @@ const AdvancedResults = (model, populate) => async (req, res, next) => {
       const newKey = key.substring(7);
       search[newKey] = { $regex: regex };
       delete req.query[key];
+    } else if (key.startsWith("_greater")) {
+      const newKey = key.substring(8);
+      const date = new Date(req.query[key]);
+      req.query[newKey] = { gt: date };
+      delete req.query[key];
     }
   }
 

@@ -65,11 +65,24 @@ const UserSchema = new mongoose.Schema(
       ],
     },
     cert: String,
+    about: String,
     male: {
       type: Boolean,
       default: false,
     },
     female: {
+      type: Boolean,
+      default: true,
+    },
+    emailNotification: {
+      type: Boolean,
+      default: true,
+    },
+    siteNotification: {
+      type: Boolean,
+      default: true,
+    },
+    smsNotification: {
       type: Boolean,
       default: true,
     },
@@ -87,6 +100,7 @@ const UserSchema = new mongoose.Schema(
               {
                 name: String,
                 price: Number,
+                time: Number,
               },
               { _id: false }
             ),
@@ -124,6 +138,68 @@ const UserSchema = new mongoose.Schema(
     refreshToken: String,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+    freeTime: [
+      new mongoose.Schema({
+        day: {
+          type: Number,
+          required: true,
+          min: [0, "Day starts from 0"],
+          max: [6, "Day cannot be more that 6"],
+        },
+        hour: {
+          type: Number,
+          required: true,
+        },
+        endhour: {
+          type: Number,
+          required: true,
+        },
+        duration: {
+          type: Number,
+          required: true,
+        },
+        minute: {
+          type: Number,
+          required: true,
+        },
+        endminute: {
+          type: Number,
+          required: true,
+        },
+        zone: {
+          type: String,
+          required: true,
+        },
+        free: {
+          type: Boolean,
+          default: true,
+        },
+      }),
+    ],
+    rating: {
+      type: Number,
+      min: 1,
+      max: 500,
+    },
+    favorite: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    priceType: {
+      type: String,
+      enum: ["flat", "percent"],
+      default: "flat",
+    },
+    priceAmount: {
+      type: Number,
+      default: 0,
+    },
+    balance: {
+      type: Number,
+      default: 0,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -134,6 +210,21 @@ const UserSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+// reverse populate with virtuals
+UserSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "store",
+  justOne: false,
+});
+
+// reverse populate with virtuals
+UserSchema.virtual("booking", {
+  ref: "Booking",
+  localField: "_id",
+  foreignField: "user",
+});
 
 // encrypt password using bcryptjs
 UserSchema.pre("save", async function (next) {

@@ -6,6 +6,7 @@ const {
   getGoogleUser,
   sendTokenResponse,
 } = require("../helpers/authHelpers");
+const { uploadToS3 } = require("../utils/fileUploadService");
 const User = require("../models/User");
 
 // @desc    Register User
@@ -230,18 +231,18 @@ exports.userPhotoUpload = asyncHandler(async (req, res, next) => {
     folderName: "glamour avatar",
   });
 
-  await User.findByIdAndUpdate(
+  const newUser = await User.findByIdAndUpdate(
     req.user.id,
     { picture: avatar[0] },
     {
       new: true,
       runValidators: true,
     }
-  ).select(necessary);
+  );
 
   res.status(200).json({
     success: true,
-    data: avatar,
+    data: newUser,
   });
 });
 
