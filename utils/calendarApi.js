@@ -8,86 +8,44 @@ const oAuth2Client = new google.auth.OAuth2(
   `https://www.trailng.com/`
 );
 
-exports.scheduleMeeting = async (user, mentor, scheduleTime, second) => {
+exports.scheduleMeeting = async (
+  user,
+  business,
+  scheduleTime,
+  title,
+  desc,
+  date
+) => {
   // Call the setCredentials method on our oAuth2Client instance and set our refresh token.
-  // oAuth2Client.setCredentials({
-  //   refresh_token: mentor.refreshToken,
-  // });
+  oAuth2Client.setCredentials({
+    refresh_token: business.refreshToken,
+  });
 
-  // const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+  const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
-  const date = new Date();
   const year = date.getUTCFullYear();
-  const month = date.getUTCMonth() + 1;
+  const month = date.getUTCMonth();
   const day = date.getUTCDate();
-  var userDay = scheduleTime.day;
+  const hour = scheduleTime.hour;
+  const endhour = scheduleTime.endhour;
+  const endminute = scheduleTime.endminute;
+  const minute = scheduleTime.minute;
+  const timezone = scheduleTime.zone;
 
-  const utcTime = moment().tz(scheduleTime.timezone);
-  const timeDiff = utcTime.format("Z");
+  const localDate = moment.tz({ year, month, day, hour, minute }, timezone);
+  const utcDate = localDate.utc();
 
-  let setValue = (val) => (val > 9 ? "" : "0") + val;
-
-  const tzTime = `${year}-${setValue(month)}-${setValue(day)}T${setValue(
-    scheduleTime.hour
-  )}:${setValue(scheduleTime.minute)}:00${timeDiff}`;
-  const endTime = new Date(tzTime);
-  const utcDate = new Date(tzTime);
-  if (
-    utcDate.getUTCDay() - date.getUTCDay() === -1 ||
-    utcDate.getUTCDay() - date.getUTCDay() === 6
-  ) {
-    userDay -= 1;
-  } else if (
-    utcDate.getUTCDay() - date.getUTCDay() === 1 ||
-    utcDate.getUTCDay() - date.getUTCDay() === -6
-  ) {
-    userDay += 1;
-  }
-
-  const resetDay = date.getUTCDate() + ((1 + 7 - date.getUTCDay()) % 7 || 7);
-  const utcReset = new Date();
-  var resetHour = 0;
-  timeDiff.split("")[0] === "+"
-    ? (resetHour =
-        0 - parseInt(`${timeDiff.split("")[1]}${timeDiff.split("")[2]}`))
-    : (resetHour =
-        0 + parseInt(`${timeDiff.split("")[1]}${timeDiff.split("")[2]}`));
-  utcReset.setUTCDate(resetDay);
-  utcReset.setUTCHours(resetHour, 0, 0);
-
-  const meetingDay = date.getUTCDate() + ((userDay + 7 - date.getUTCDay()) % 7);
-  utcDate.setUTCDate(meetingDay);
-  endTime.setUTCDate(meetingDay);
-  endTime.setUTCHours(endTime.getUTCHours() + 1);
-
-  const remindTime = Math.floor((utcDate - date) / (1000 * 60));
-
-  if (month - (utcDate.getUTCMonth() + 1) === 1) {
-    utcDate.setUTCMonth(utcDate.getUTCMonth() + 1);
-    endTime.setUTCMonth(utcDate.getUTCMonth());
-  }
-
-  if (parseInt(year) - parseInt(utcDate.getUTCFullYear()) === 1) {
-    utcDate.setUTCFullYear(year);
-    endTime.setUTCFullYear(year);
-  }
-
-  if (second && utcDate - utcReset < 0) {
-    utcDate.setUTCDate(utcDate.getUTCDate() + 7);
-    endTime.setUTCDate(endTime.getUTCDate() + 7);
-  }
-
-  if (!second && (date - utcDate > 0 || utcDate - utcReset > 0)) {
-    let err;
-    return err;
-  }
+  const endlocalDate = moment.tz(
+    { year, month, day, endhour, endminute },
+    timezone
+  );
+  const endTime = endlocalDate.utc();
 
   const eventId = `${uuidv4()}`.replace(/-/g, "");
-  const requestId = `${uuidv4()}`.replace(/-/g, "");
 
   const event = {
-    summary: `Trail mentor meeting with ${mentor.firstName} ${mentor.lastName}`,
-    description: `Meet with ${mentor.firstName} to discuss career plans`,
+    summary: title,
+    description: desc,
     colorId: 7,
     start: {
       dateTime: utcDate,
@@ -103,10 +61,6 @@ exports.scheduleMeeting = async (user, mentor, scheduleTime, second) => {
       overrides: [
         {
           method: "email",
-          minutes: remindTime,
-        },
-        {
-          method: "email",
           minutes: 1440,
         },
         {
@@ -120,22 +74,14 @@ exports.scheduleMeeting = async (user, mentor, scheduleTime, second) => {
         email: user.email,
       },
     ],
-    conferenceData: {
-      createRequest: {
-        requestId: `${requestId}`,
-        conferenceSolutionKey: {
-          type: "hangoutsMeet",
-        },
-      },
-    },
   };
 
-  // const result = await calendar.events.insert({
-  //   calendarId: 'primary',
-  //   resource: event,
-  //   sendUpdates: 'all',
-  //   conferenceDataVersion: 1,
-  // });
+  calendar.events.insert({
+    calendarId: "primary",
+    resource: event,
+    sendUpdates: "all",
+    conferenceDataVersion: 1,
+  });
 
   const result = {
     data: {

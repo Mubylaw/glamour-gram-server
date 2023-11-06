@@ -1,5 +1,5 @@
 const express = require("express");
-const { createPayment } = require("../controllers/payment");
+const { createPayment, webhook } = require("../controllers/payment");
 
 // const Payment = require("../models/Payment");
 
@@ -9,7 +9,8 @@ const router = express.Router({ mergeParams: true });
 const { protect, authorize } = require("../middleware/auth");
 const advancedResults = require("../middleware/advancedResults");
 
-router.post("/", createPayment);
+router.post("/", protect, createPayment);
+router.post("/webhook", webhook);
 // router.get("/", advancedResults(Payment), getPayments);
 // router
 //   .route("/:id")

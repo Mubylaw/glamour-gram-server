@@ -15,12 +15,11 @@ const router = express.Router({ mergeParams: true });
 const { protect, authorize } = require("../middleware/auth");
 const advancedResults = require("../middleware/advancedResults");
 
+router.get("/", advancedResults(Appointment), getAppointments);
+
 router.use(protect);
 
-router
-  .route("/")
-  .get(advancedResults(Appointment), getAppointments)
-  .post(scheduleAppointment);
+router.route("/").post(scheduleAppointment);
 
 router
   .route("/:id")

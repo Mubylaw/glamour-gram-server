@@ -108,18 +108,20 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     var item = oldUser.category;
     if (item) {
       var category = item.find((e) => {
-        return e.name === req.body.category;
+        return e.name.toLowerCase() === req.body.category.toLowerCase();
       });
       if (category) {
         var service = category.service.find((e) => {
-          return e.name === req.body.service;
+          return e.name.toLowerCase() === req.body.service.toLowerCase();
         });
         if (service) {
           service.price = req.body.price;
+          service.time = req.body.time;
         } else {
           category.service.push({
             name: req.body.service,
             price: req.body.price,
+            time: req.body.time,
           });
         }
       } else {
@@ -129,6 +131,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
             {
               name: req.body.service,
               price: req.body.price,
+              time: req.body.time,
             },
           ],
         };
@@ -138,7 +141,11 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
       item = [
         {
           name: req.body.category,
-          service: { name: req.body.service, price: req.body.price },
+          service: {
+            name: req.body.service,
+            price: req.body.price,
+            time: req.body.time,
+          },
         },
       ];
     }

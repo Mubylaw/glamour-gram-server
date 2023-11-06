@@ -170,10 +170,6 @@ const UserSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-        free: {
-          type: Boolean,
-          default: true,
-        },
       }),
     ],
     rating: {
