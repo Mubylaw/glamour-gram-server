@@ -4,7 +4,7 @@ const axios = require("axios");
 const oauth2Client = new google.auth.OAuth2(
   process.env.CALENDAR_API_CLIENT_ID,
   process.env.CALENDAR_API_CLIENT_SECRET,
-  `http://localhost:5173/calendar`
+  `https://glamor-gram-client.onrender.com/calendar`
 );
 
 exports.getGoogleAuthURL = () => {
