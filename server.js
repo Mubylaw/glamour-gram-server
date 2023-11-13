@@ -29,6 +29,7 @@ const bookings = require("./routes/bookings");
 const appointments = require("./routes/appointments");
 const tickets = require("./routes/tickets");
 const payment = require("./routes/payment");
+const chat = require("./routes/chat");
 
 const app = express();
 
@@ -74,6 +75,7 @@ app.use("/api/v1/bookings", bookings);
 app.use("/api/v1/appointments", appointments);
 app.use("/api/v1/tickets", tickets);
 app.use("/api/v1/payment", payment);
+app.use("/api/v1/chat", chat);
 
 app.use(errorHandler);
 

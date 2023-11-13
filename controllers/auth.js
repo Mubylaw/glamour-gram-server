@@ -8,6 +8,7 @@ const {
 } = require("../helpers/authHelpers");
 const { uploadToS3 } = require("../utils/fileUploadService");
 const User = require("../models/User");
+const axios = require("axios");
 
 // @desc    Register User
 // @route   POST /api/v1/auth/register

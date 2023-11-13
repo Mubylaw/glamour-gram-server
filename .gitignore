@@ -1,3 +1,5 @@
 config/config.env 
 node_modules
 temp
+faiss_index*
+temp*
