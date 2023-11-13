@@ -15,6 +15,10 @@ const UserSchema = new mongoose.Schema(
       required: [true, "Please add a last name"],
       trim: true,
     },
+    username: {
+      type: String,
+      unique: true,
+    },
     name: {
       type: String,
       trim: true,
@@ -220,6 +224,14 @@ UserSchema.virtual("booking", {
   ref: "Booking",
   localField: "_id",
   foreignField: "user",
+});
+
+// create slug from name
+UserSchema.pre("save", function (next) {
+  this.username = slugify(`${this.name}`, {
+    lower: true,
+  });
+  next();
 });
 
 // encrypt password using bcryptjs
