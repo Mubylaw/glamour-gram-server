@@ -23,7 +23,7 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   const options = JSON.stringify({
     sender: {
-      name: "Glamor Gram",
+      name: "GlamorGram",
       email: "ml@ojehs.com",
     },
     to: [
@@ -32,9 +32,9 @@ exports.register = asyncHandler(async (req, res, next) => {
         name: `${user.firstName} ${user.lastName}`,
       },
     ],
-    subject: "Welcome to Glamor Gram",
+    subject: "Welcome to GlamorGram",
     htmlContent:
-      "<html><head></head><body><p>Hello,</p>Welcome to Glamor Gram</p></body></html>",
+      "<html><head></head><body><p>Hello,</p>Welcome to GlamorGram</p></body></html>",
   });
 
   const email = await axios(send_email_url, {

@@ -96,22 +96,32 @@ const UserSchema = new mongoose.Schema(
       default: "female",
     },
     category: [
-      new mongoose.Schema(
-        {
-          name: String,
-          service: [
-            new mongoose.Schema(
-              {
-                name: String,
-                price: Number,
-                time: Number,
-              },
-              { _id: false }
-            ),
+      new mongoose.Schema({
+        name: {
+          type: String,
+          enum: [
+            "Nails",
+            "Makeup",
+            "Skincare",
+            "Massage",
+            "Hair Removal",
+            "Barber",
+            "Aesthetics",
+            "Hair",
           ],
         },
-        { _id: false }
-      ),
+        service: [
+          new mongoose.Schema(
+            {
+              name: String,
+              price: Number,
+              time: Number,
+              tag: [String],
+            },
+            { _id: false }
+          ),
+        ],
+      }),
     ],
     email: {
       type: String,
@@ -122,10 +132,20 @@ const UserSchema = new mongoose.Schema(
         "Please add a valid email",
       ],
     },
+    address: String,
+    homeService: {
+      type: Boolean,
+      default: false,
+    },
     role: {
       type: String,
       enum: ["user", "business"],
       default: "user",
+    },
+    currency: {
+      type: String,
+      enum: ["euros", "pounds"],
+      default: "euros",
     },
     password: {
       type: String,
@@ -150,6 +170,9 @@ const UserSchema = new mongoose.Schema(
           min: [0, "Day starts from 0"],
           max: [6, "Day cannot be more that 6"],
         },
+        date: Number,
+        month: Number,
+        year: Number,
         hour: {
           type: Number,
           required: true,

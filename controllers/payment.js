@@ -53,13 +53,13 @@ exports.createPayment = asyncHandler(async (req, res, next) => {
         endTime,
         duration: item.selectTime.duration,
         price: item.price,
+        homeService: item.homeService,
       };
 
       const appointment = await Appointment.create(meeting);
-      console.log(item.image);
       return {
         price_data: {
-          currency: "gbp",
+          currency: item.business.currency === "pounds" ? "gbp" : "eur",
           product_data: {
             name: item.name,
             images: [item.image],

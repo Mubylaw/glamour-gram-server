@@ -108,21 +108,41 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     var item = oldUser.category;
     if (item) {
       var category = item.find((e) => {
-        return e.name.toLowerCase() === req.body.category.toLowerCase();
+        return e.id === req.body.catId;
       });
       if (category) {
-        var service = category.service.find((e) => {
-          return e.name.toLowerCase() === req.body.service.toLowerCase();
-        });
-        if (service) {
-          service.price = req.body.price;
-          service.time = req.body.time;
+        if (category.name !== req.body.category) {
+          category.service = category.service.filter(
+            (ser) => ser.name !== req.body.service
+          );
+          var newCategory = {
+            name: req.body.category,
+            service: [
+              {
+                name: req.body.service,
+                price: req.body.price,
+                time: req.body.time,
+                tag: req.body.tag,
+              },
+            ],
+          };
+          item.push(newCategory);
         } else {
-          category.service.push({
-            name: req.body.service,
-            price: req.body.price,
-            time: req.body.time,
+          var service = category.service.find((e) => {
+            return e.name.toLowerCase() === req.body.service.toLowerCase();
           });
+          if (service) {
+            service.price = req.body.price;
+            service.time = req.body.time;
+            service.tag = req.body.tag;
+          } else {
+            category.service.push({
+              name: req.body.service,
+              price: req.body.price,
+              time: req.body.time,
+              tag: req.body.tag,
+            });
+          }
         }
       } else {
         var newCategory = {
@@ -132,6 +152,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
               name: req.body.service,
               price: req.body.price,
               time: req.body.time,
+              tag: req.body.tag,
             },
           ],
         };
@@ -145,6 +166,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
             name: req.body.service,
             price: req.body.price,
             time: req.body.time,
+            tag: req.body.tag,
           },
         },
       ];

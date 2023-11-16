@@ -23,6 +23,7 @@ const AppointmentSchema = new mongoose.Schema({
   price: Number,
   storeQuery: String,
   userQuery: String,
+  homeService: Boolean,
   storeRating: {
     type: mongoose.Schema.ObjectId,
     ref: "Review",
