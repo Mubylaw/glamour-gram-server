@@ -203,6 +203,7 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       min: 1,
       max: 500,
+      default: 1,
     },
     favorite: [
       {
