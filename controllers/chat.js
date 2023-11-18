@@ -52,7 +52,7 @@ exports.createVectorStore = asyncHandler(async (req, res, next) => {
     const embeddings = new OpenAIEmbeddings();
     const vectorstore = await FaissStore.fromDocuments(documents, embeddings);
     await vectorstore.save(faissIndexPath);
-    fs.unlinkSync(tempFilePath);
+    // fs.unlinkSync(tempFilePath);
   } catch (error) {
     console.error("Error:", error);
   }
@@ -70,6 +70,7 @@ exports.askQuestion = asyncHandler(async (req, res, next) => {
   const embeddings = new OpenAIEmbeddings();
   const faissIndexPath = `./faiss_index_${req.body.biz}`;
   const vectorStore = await FaissStore.load(faissIndexPath, embeddings);
+  const name = await User.findById(req.body.biz).select("name");
 
   // Create or retrieve user memory
   let userMemory = userMemories.get(req.user.id);
@@ -89,7 +90,7 @@ exports.askQuestion = asyncHandler(async (req, res, next) => {
 
   const chatPrompt = ChatPromptTemplate.fromMessages([
     SystemMessagePromptTemplate.fromTemplate(
-      "The following is a friendly conversation between a human and an AI. The AI is here to assist you with any questions you may have about businesses on our site. It can provide specific details and information. If the AI doesn't have the answer, it will truthfully mention that it doesn't know. Feel free to ask anything!"
+      `The following is a friendly conversation between a human and an AI. Assume every question is about ${name} unless otherwise stated. Feel free to ask anything!`
     ),
     HumanMessagePromptTemplate.fromTemplate("{query}"),
   ]);
