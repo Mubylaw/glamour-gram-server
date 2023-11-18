@@ -103,7 +103,7 @@ exports.webhook = asyncHandler(async (req, res, next) => {
 
   // Check if webhook signing is configured.
   let webhookSecret;
-  //webhookSecret = process.env.STRIPE_WEB_HOOK;
+  webhookSecret = process.env.STRIPE_WEB_HOOK;
 
   if (webhookSecret) {
     // Retrieve the event by verifying the signature using the raw body and secret.
@@ -122,12 +122,16 @@ exports.webhook = asyncHandler(async (req, res, next) => {
     }
     // Extract the object from the event.
     data = event.data.object;
+    console.log("data", data);
     eventType = event.type;
+    console.log("event", event);
   } else {
     // Webhook signing is recommended, but if the secret is not configured in `config.js`,
     // retrieve the event data directly from the request body.
     data = req.body.data.object;
+    console.log("data", data);
     eventType = req.body.type;
+    console.log("event", event);
   }
 
   // Handle the checkout.session.completed event
