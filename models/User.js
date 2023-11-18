@@ -133,6 +133,15 @@ const UserSchema = new mongoose.Schema(
       ],
     },
     address: String,
+    location: String,
+    latitude: {
+      type: Number,
+      default: 0,
+    },
+    longitude: {
+      type: Number,
+      default: 0,
+    },
     homeService: {
       type: Boolean,
       default: false,

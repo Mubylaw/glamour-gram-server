@@ -18,6 +18,7 @@ const {
   deleteUser,
   addTime,
   removeTime,
+  getBusinesses,
 } = require("../controllers/users");
 
 const User = require("../models/User");
@@ -30,6 +31,7 @@ const advancedResults = require("../middleware/advancedResults");
 
 router.post("/", protect, authorize("admin"), createUser);
 router.get("/", advancedResults(User), getUsers);
+router.post("/business", getBusinesses);
 router.put("/freetime", protect, addTime);
 router.delete("/freetime/:id", protect, removeTime);
 router.get("/:id", getUser);

@@ -1,7 +1,10 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const User = require("../models/User");
-const getGeolocationFromAddress = require("../helpers/map");
+const {
+  getGeolocationFromAddress,
+  calculateDistance,
+} = require("../helpers/map");
 const { uploadToS3 } = require("../utils/fileUploadService");
 
 // @desc    Get All Users
@@ -9,6 +12,41 @@ const { uploadToS3 } = require("../utils/fileUploadService");
 // @access  Private / admin
 exports.getUsers = asyncHandler(async (req, res, next) => {
   res.status(200).json(res.advancedResults);
+});
+
+// @desc    Get All Businesses
+// @route   GET /api/v1/user/business
+// @access  Private / admin
+exports.getBusinesses = asyncHandler(async (req, res, next) => {
+  var businesses = await User.find({ role: "business" });
+
+  if (req.body.location) {
+    const location = await getGeolocationFromAddress(req.body.location);
+    if (location && location.within) {
+      req.body.latitude = location.latitude;
+      req.body.longitude = location.longitude;
+    }
+  }
+
+  if (req.body.distance && req.body.longitude) {
+    businesses = businesses
+      .map((business) => ({
+        ...business._doc,
+        distance: calculateDistance(
+          req.body.latitude,
+          req.body.longitude,
+          business.latitude,
+          business.longitude
+        ),
+      }))
+      .filter((business) => business.distance <= req.body.distance)
+      .sort((a, b) => a.distance - b.distance);
+  }
+
+  res.status(200).json({
+    success: true,
+    data: businesses,
+  });
 });
 
 // @desc    Get a single User
@@ -44,10 +82,19 @@ exports.createUser = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/user/:id
 // @access  Private
 exports.updateUser = asyncHandler(async (req, res, next) => {
-  // if (req.body.location) {
-  //   const location = await getGeolocationFromAddress(req.body.location);
-  //   console.log(location);
-  // }
+  if (req.body.location) {
+    const location = await getGeolocationFromAddress(req.body.location);
+    if (!location || !location.within) {
+      return next(
+        new ErrorResponse(
+          `Please enter an address that is in the UK or Ireland`,
+          400
+        )
+      );
+    }
+    req.body.latitude = location.latitude;
+    req.body.longitude = location.longitude;
+  }
 
   const oldUser = await User.findById(req.params.id);
 
