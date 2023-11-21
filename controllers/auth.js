@@ -24,7 +24,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   const options = JSON.stringify({
     sender: {
       name: "GlamorGram",
-      email: "ml@ojehs.com",
+      email: "info@glamorgram.com",
     },
     to: [
       {
