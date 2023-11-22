@@ -15,9 +15,9 @@ const router = express.Router({ mergeParams: true });
 const { protect, authorize } = require("../middleware/auth");
 const advancedResults = require("../middleware/advancedResults");
 
+router.post("/", createWaitlist);
 router.use(protect);
 
-router.post("/", createWaitlist);
 router.get("/", advancedResults(Waitlist), getWaitlists);
 router
   .route("/:id")
