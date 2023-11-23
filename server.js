@@ -64,7 +64,11 @@ app.use(limiter);
 app.use(hpp());
 
 // Enable cors
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://www.glamorgram.com",
+  })
+);
 
 // set static folder
 app.use(express.static(path.join(__dirname, "public")));

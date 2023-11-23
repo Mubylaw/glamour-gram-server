@@ -83,8 +83,8 @@ exports.createPayment = asyncHandler(async (req, res, next) => {
     line_items,
     mode: "payment",
     customer: customer.id,
-    success_url: `https://glamor-gram-client.onrender.com/`,
-    cancel_url: `https://glamor-gram-client.onrender.com/${req.body.cartItems[0].business._id}`,
+    success_url: `https://glamorgram.com/`,
+    cancel_url: `https://glamorgram.com/${req.body.cartItems[0].business._id}`,
   });
 
   res.status(201).json({
