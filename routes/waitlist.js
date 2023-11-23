@@ -5,7 +5,7 @@ const {
   createWaitlist,
   updateWaitlist,
   deleteWaitlist,
-} = require("../controllers/waitlists");
+} = require("../controllers/waitlist");
 
 const Waitlist = require("../models/Waitlist");
 

@@ -1,6 +1,7 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Waitlist = require("../models/Waitlist");
+const axios = require("axios");
 
 // @desc    Get All Waitlists
 // @route   GET /api/v1/waitlist
@@ -30,10 +31,34 @@ exports.getWaitlist = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/waitlist
 // @access  Public
 exports.createWaitlist = asyncHandler(async (req, res, next) => {
-  const bokks = await Waitlist.find({ user: req.user.id }).select("no");
-  req.body.no = bokks.length + 1;
-  req.body.user = req.user.id;
   const waitlist = await Waitlist.create(req.body);
+
+  // send email
+  const send_email_url = "https://api.brevo.com/v3/smtp/email";
+
+  const options = JSON.stringify({
+    sender: {
+      name: "GlamorGram",
+      email: "info@glamorgram.com",
+    },
+    to: [
+      {
+        email: `info@glamorgram.com`,
+        name: `GlamorGram Admin`,
+      },
+    ],
+    subject: "Waitlist Subscriber",
+    htmlContent: `<html><head></head><body><p>Hello,</p>You have a new waitlist subscriber</p><ul><li>Name: ${req.body.name}</li><li>Email: ${req.body.email}</li></ul></body></html>`,
+  });
+
+  const email = await axios(send_email_url, {
+    method: "POST",
+    data: options,
+    headers: {
+      "api-key": `${process.env.BREVO_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+  });
 
   res.status(201).json({
     success: true,
