@@ -65,12 +65,7 @@ app.use(hpp());
 
 // Enable cors
 app.use(
-  cors({
-    origin: "https://www.glamorgram.com",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-    optionsSuccessStatus: 204,
-  })
+  cors()
 );
 
 // set static folder
