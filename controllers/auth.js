@@ -232,6 +232,10 @@ exports.userPhotoUpload = asyncHandler(async (req, res, next) => {
     folderName: "glamour avatar",
   });
 
+  console.log("avatar", avatar)
+  if(!avatar) {
+    return next(new ErrorResponse(`error ${avatar}`))
+  }
   const newUser = await User.findByIdAndUpdate(
     req.user.id,
     { picture: avatar[0] },
