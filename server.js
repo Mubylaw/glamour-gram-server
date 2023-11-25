@@ -67,6 +67,7 @@ app.use(hpp());
 app.use(
   cors()
 );
+app.set('trust proxy', true);
 
 // set static folder
 app.use(express.static(path.join(__dirname, "public")));
