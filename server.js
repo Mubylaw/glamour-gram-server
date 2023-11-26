@@ -64,10 +64,7 @@ app.use(limiter);
 app.use(hpp());
 
 // Enable cors
-app.use(
-  cors()
-);
-app.set('trust proxy', true);
+app.use(cors());
 
 // set static folder
 app.use(express.static(path.join(__dirname, "public")));
