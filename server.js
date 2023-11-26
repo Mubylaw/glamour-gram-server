@@ -33,7 +33,7 @@ const chat = require("./routes/chat");
 const waitlist = require("./routes/waitlist");
 
 const app = express();
-app.set("trust proxy", true)
+
 // body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
