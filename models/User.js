@@ -23,12 +23,12 @@ const UserSchema = new mongoose.Schema(
     name: {
       type: String,
       trim: true,
+      unique: true,
     },
     industry: String,
     portfolio: [
       {
         type: String,
-        unique: true,
         match: [
           /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
           "Please add a valid url",
@@ -38,7 +38,6 @@ const UserSchema = new mongoose.Schema(
     pin: [
       {
         type: String,
-        unique: true,
         match: [
           /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
           "Please add a valid url",
@@ -280,8 +279,15 @@ UserSchema.pre("save", async function (next) {
 
 // custom error message
 UserSchema.post("save", function (error, doc, next) {
-  if (error.name === "MongoError" && error.code === 11000) {
-    next(new Error("This account already exists"));
+  if (error.name === "MongoServerError" && error.code === 11000) {
+    if (
+      Object.keys(error.keyPattern)[0] === "name" ||
+      Object.keys(error.keyPattern)[0] === "username"
+    ) {
+      next(new Error("That business name is already taken"));
+    } else {
+      next(new Error("This account already exists"));
+    }
   } else {
     next(error);
   }
