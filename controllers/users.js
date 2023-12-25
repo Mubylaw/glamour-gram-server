@@ -55,9 +55,7 @@ exports.getBusinesses = asyncHandler(async (req, res, next) => {
 exports.getUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id).populate(req.query.populate);
   if (!user) {
-    return next(
-      new ErrorResponse(`User not found with id of ${req.params.id}`, 404)
-    );
+    return next(new ErrorResponse(`User not found`, 404));
   }
 
   res.status(200).json({
@@ -116,15 +114,15 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
       );
     }
 
-    const portfolio = await uploadToS3({
-      file: req.files.portfolio,
-      folderName: "glamor portfolio",
-    });
-    if (oldUser.portfolio) {
-      req.body.portfolio = [portfolio[0], ...oldUser.portfolio];
-    } else {
-      req.body.portfolio = [portfolio[0]];
-    }
+    // const portfolio = await uploadToS3({
+    //   file: req.files.portfolio,
+    //   folderName: "glamor portfolio",
+    // });
+    // if (oldUser.portfolio) {
+    //   req.body.portfolio = [portfolio[0], ...oldUser.portfolio];
+    // } else {
+    //   req.body.portfolio = [portfolio[0]];
+    // }
   }
 
   if (req.body.pin) {
