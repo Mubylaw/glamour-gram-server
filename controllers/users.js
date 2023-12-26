@@ -114,15 +114,15 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
       );
     }
 
-    // const portfolio = await uploadToS3({
-    //   file: req.files.portfolio,
-    //   folderName: "glamor portfolio",
-    // });
-    // if (oldUser.portfolio) {
-    //   req.body.portfolio = [portfolio[0], ...oldUser.portfolio];
-    // } else {
-    //   req.body.portfolio = [portfolio[0]];
-    // }
+    const portfolio = await uploadToS3({
+      file: req.files.portfolio,
+      folderName: "glamor portfolio",
+    });
+    if (oldUser.portfolio) {
+      req.body.portfolio = [portfolio[0], ...oldUser.portfolio];
+    } else {
+      req.body.portfolio = [portfolio[0]];
+    }
   }
 
   if (req.body.pin) {
