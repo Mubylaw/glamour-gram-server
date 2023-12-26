@@ -207,7 +207,6 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/auth/avatar
 // @access  Private
 exports.userPhotoUpload = asyncHandler(async (req, res, next) => {
-  return next(new ErrorResponse(`error ${req.files}`));
   if (req.files.avatar) {
     return next(new ErrorResponse(`Please upload an image`), 400);
   }
