@@ -21,6 +21,7 @@ const {
   userPhotoUpload,
   googleLogin,
   googleUrl,
+  googleUrlLogin,
 } = require("../controllers/auth");
 
 const router = express.Router();
@@ -30,6 +31,7 @@ const { protect } = require("../middleware/auth");
 router.post("/register", register);
 router.post("/login", login);
 router.get("/googleurl", googleUrl);
+router.get("/googleurlLogin", googleUrlLogin);
 router.get("/google", googleLogin);
 router.get("/me", protect, getMe);
 router.post("/forgotpassword", forgotPassword);

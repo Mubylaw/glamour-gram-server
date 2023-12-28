@@ -263,6 +263,18 @@ exports.googleUrl = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Google Url For Login
+// @route   GET /api/v1/auth/googleurlLogin
+// @access  Public
+exports.googleUrlLogin = asyncHandler(async (req, res, next) => {
+  const googleUrl = getGoogleAuthURL(true);
+
+  res.status(200).json({
+    success: true,
+    data: googleUrl,
+  });
+});
+
 // @desc    Register User with Google
 // @route   GET /api/v1/auth/google
 // @access  Public

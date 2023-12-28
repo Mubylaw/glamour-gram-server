@@ -4,21 +4,28 @@ const axios = require("axios");
 const oauth2Client = new google.auth.OAuth2(
   process.env.CALENDAR_API_CLIENT_ID,
   process.env.CALENDAR_API_CLIENT_SECRET,
-  `https://glamor-gram-client.onrender.com/calendar`
+  `https://glamorgram.com`
 );
 
-exports.getGoogleAuthURL = () => {
-  const scopes = [
-    "https://www.googleapis.com/auth/userinfo.profile",
-    "https://www.googleapis.com/auth/userinfo.email",
-    "https://www.googleapis.com/auth/calendar",
-    "https://www.googleapis.com/auth/calendar.events",
-  ];
+exports.getGoogleAuthURL = (login) => {
+  if (login) {
+    var scope = [
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+    ];
+  } else {
+    var scope = [
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/calendar",
+      "https://www.googleapis.com/auth/calendar.events",
+    ];
+  }
 
   return oauth2Client.generateAuthUrl({
     access_type: "offline",
     prompt: "consent",
-    scope: scopes,
+    scope,
   });
 };
 
