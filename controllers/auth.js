@@ -291,7 +291,6 @@ exports.googleLogin = asyncHandler(async (req, res, next) => {
       firstName: googleUser.given_name,
       lastName: googleUser.family_name,
       email: googleUser.email,
-      password: "null",
       role: "user",
       picture: googleUser.picture || "no-user.jpg",
       googleId: googleUser.id,
@@ -299,19 +298,19 @@ exports.googleLogin = asyncHandler(async (req, res, next) => {
     });
 
     sendTokenResponse(user, 200, res);
+  } else {
+    if (googleUser.tokens.refresh_token) {
+      var fieldsToUpdate = {
+        refreshToken: googleUser.tokens.refresh_token,
+        googleId: googleUser.id,
+      };
+    }
+
+    const newUser = await User.findByIdAndUpdate(user._id, fieldsToUpdate, {
+      new: true,
+      runValidators: true,
+    });
+
+    sendTokenResponse(newUser, 200, res);
   }
-
-  if (googleUser.tokens.refresh_token) {
-    var fieldsToUpdate = {
-      refreshToken: googleUser.tokens.refresh_token,
-      googleId: googleUser.id,
-    };
-  }
-
-  const newUser = await User.findByIdAndUpdate(user._id, fieldsToUpdate, {
-    new: true,
-    runValidators: true,
-  });
-
-  sendTokenResponse(newUser, 200, res);
 });
