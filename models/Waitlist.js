@@ -38,4 +38,13 @@ const WaitlistSchema = new mongoose.Schema(
   }
 );
 
+// custom error message
+WaitlistSchema.post("save", function (error, doc, next) {
+  if (error.name === "MongoServerError" && error.code === 11000) {
+    next(new Error("This email is already on the waitlist!"));
+  } else {
+    next(error);
+  }
+});
+
 module.exports = mongoose.model("Waitlist", WaitlistSchema);

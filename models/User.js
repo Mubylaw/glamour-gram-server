@@ -46,7 +46,6 @@ const UserSchema = new mongoose.Schema(
     ],
     insta: {
       type: String,
-      unique: true,
       match: [
         /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
         "Please add a valid url",
@@ -54,7 +53,6 @@ const UserSchema = new mongoose.Schema(
     },
     twitter: {
       type: String,
-      unique: true,
       match: [
         /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
         "Please add a valid url",
@@ -62,7 +60,6 @@ const UserSchema = new mongoose.Schema(
     },
     facebook: {
       type: String,
-      unique: true,
       match: [
         /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
         "Please add a valid url",
