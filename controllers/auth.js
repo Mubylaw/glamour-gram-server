@@ -279,7 +279,7 @@ exports.googleUrlLogin = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/auth/google
 // @access  Public
 exports.googleLogin = asyncHandler(async (req, res, next) => {
-  console.log("google code", req.query);
+  console.log("google code", req);
   const googleCode = req.query.code;
   const googleUser = await getGoogleUser({ code: googleCode });
 
